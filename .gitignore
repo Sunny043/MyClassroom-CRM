@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/backend/node_modules
 /.pnp
 .pnp.js
 
@@ -10,14 +11,24 @@
 
 # production
 /build
+/dist
 
-# misc
-.DS_Store
+# environment variables
+.env
+/backend/.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# misc
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
