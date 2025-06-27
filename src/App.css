@@ -1,39 +1,192 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #ff7300, #f65d00);
+  min-height: 100vh;
+}
+
+.App-header .navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+  color: #ff7300 !important;
+  font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Wrapper for Student List */
 .wrapper {
-  padding-top: 30px;
+  background-color: #fff6ec;
+  padding: 30px;
+  margin-top: 40px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 95%;
+  max-width: 1600px; /* Specific to Student List */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-body h3 {
+/* Wrapper for Create Student */
+.create-student-wrapper {
+  background-color: #fff6ec;
+  padding: 30px;
+  margin-top: 40px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Set width to make it a square */
+  height: 400px; /* Set height equal to width */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex; /* Center content inside the square */
+  flex-direction: column; /* Stack content vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+}
+
+/* Wrapper for Create Student */
+.create-student-card {
+    background-color: #fff6ec;
+    padding: 30px;
+    margin-top: 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 600px; /* Increased width */
+    height: 500px; /* Increased height */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex; /* Center content inside the card */
+    flex-direction: column; /* Stack content vertically */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+}
+
+h2 {
+  font-weight: 600;
+  text-align: center;
   margin-bottom: 25px;
+  color: #333;
 }
 
-.navbar-brand a {
-  color: #ffffff;
+/* Input fields */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
 }
 
-.form-wrapper,
-.table-wrapper {
-  max-width: 500px;
-  margin: 0 auto;
+/* Orange themed button */
+.btn-custom {
+  background-color: #ff7300;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  width: 100%;
 }
 
-.table-wrapper {
-  max-width: 700px;
+.btn-custom:hover {
+  background-color: #e65c00;
 }
 
-.edit-link {
-  padding: 7px 10px;
-  font-size: 0.875rem;
-  line-height: normal;
-  border-radius: 0.2rem;
-  color: #fff;
-  background-color: #28a745;
-  border-color: #28a745;
-  margin-right: 10px;
-  position: relative;
-  top: 1px;
+/* Spinner center */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
 }
 
-.edit-link:hover {
-  text-decoration: none;
-  color: #ffffff;
+/* Table styling */
+table {
+  background-color: white;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+/* Button spacing */
+.btn + .btn {
+  margin-left: 10px;
+}
+
+/* Improve navbar alignment */
+.navbar .nav-link {
+  margin-left: 20px;
+}
+
+/* Space between action buttons */
+.action-buttons .btn {
+  margin-right: 8px;
+}
+
+/* Form controls spacing above table */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Adjust heading */
+h2 {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Form group for label and input alignment */
+.form-group {
+    display: flex;
+    flex-direction: column; /* Stack label and input vertically */
+    margin-bottom: 15px; /* Add spacing between form groups */
+}
+
+/* Label styling */
+.form-group label {
+    font-weight: bold; /* Make the label text bold */
+    margin-bottom: 5px; /* Add spacing below the label */
+}
+
+/* Center the Create Student button */
+.submit-button {
+    display: block; /* Make the button a block-level element */
+    margin: 20px auto 0; /* Center the button horizontally and add space above it */
+    padding: 10px 20px; /* Add padding for a better look */
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Slightly round the corners */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    text-align: center; /* Center the text inside the button */
+}
+
+/* General input styles */
+form input {
+    width: 100%; /* Make all inputs take up the full width */
+    padding: 10px; /* Add padding for a consistent look */
+    border: 1px solid #ccc; /* Add a light border */
+    border-radius: 4px; /* Slightly round the corners */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+    font-size: 16px; /* Set a consistent font size */
+    background-color: #fff; /* Ensure the background is white */
+    color: #000; /* Ensure the text color is black */
+}
+
+/* Focus styles for all input fields */
+form input:focus {
+    outline: none; /* Remove the default browser outline */
+    border: 2px solid #007bff; /* Add a blue border to indicate focus */
+    background-color: #f9f9f9; /* Slightly change the background color on focus */
 }
