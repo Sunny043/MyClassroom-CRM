@@ -74,49 +74,38 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
-          <Navbar expand="lg" className="custom-navbar shadow-sm">
+          <Navbar expand="md" className="shadow-sm">
             <Container>
-              <Navbar.Brand as={Link} to="/dashboard">
-                <i className="fas fa-graduation-cap me-2"></i>
-                My Class Room
+              <Navbar.Brand>
+                <Link to="/dashboard" className="nav-link text-primary fw-bold">
+                  My Class Room
+                </Link>
               </Navbar.Brand>
               
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
                   <Nav.Link as={Link} to="/create-student">
-                    <i className="fas fa-user-plus me-1"></i>
                     Create Student
                   </Nav.Link>
                   <Nav.Link as={Link} to="/student-list">
-                    <i className="fas fa-users me-1"></i>
                     Students
                   </Nav.Link>
                   {user.role === "admin" && (
                     <Nav.Link as={Link} to="/branch-management">
-                      <i className="fas fa-building me-1"></i>
                       Branches
                     </Nav.Link>
                   )}
                 </Nav>
                 
-                <Nav className="navbar-nav-right">
-                  <Navbar.Text className="user-info">
-                    <span className="welcome-text">Welcome, </span>
-                    <strong className="user-name">{user.fullName}</strong>
+                <Nav className="ms-auto">
+                  <Navbar.Text className="me-3">
+                    Welcome, <strong>{user.fullName}</strong>
                     {user.role === "coordinator" && user.branch && (
-                      <span className="branch-info"> ({user.branch.name})</span>
+                      <span className="text-muted"> ({user.branch.name})</span>
                     )}
-                    <span className="role-badge ms-2">
-                      {user.role === "admin" ? (
-                        <i className="fas fa-crown text-warning"></i>
-                      ) : (
-                        <i className="fas fa-user-tie text-info"></i>
-                      )}
-                    </span>
                   </Navbar.Text>
-                  <Button variant="outline-danger" size="sm" onClick={handleLogout} className="logout-btn">
-                    <i className="fas fa-sign-out-alt me-1"></i>
+                  <Button variant="outline-danger" size="sm" onClick={handleLogout}>
                     Logout
                   </Button>
                 </Nav>
@@ -135,55 +124,17 @@ function App() {
                 </Route>
                 
                 <Route path="/dashboard">
-                  <div className="hero-section">
-                    <Container>
-                      <Row className="justify-content-center">
-                        <Col lg={8} className="text-center">
-                          <div className="hero-content">
-                            <i className="fas fa-graduation-cap hero-icon mb-4"></i>
-                            <h1 className="hero-title mb-3">Welcome to My Class Room</h1>
-                            <p className="hero-subtitle mb-4">
-                              Comprehensive Student Management System for Modern Education
-                            </p>
-                            <div className="hero-stats mb-4">
-                              <Row>
-                                <Col md={4}>
-                                  <div className="stat-item">
-                                    <i className="fas fa-users stat-icon"></i>
-                                    <h3>Students</h3>
-                                    <p>Manage All Records</p>
-                                  </div>
-                                </Col>
-                                <Col md={4}>
-                                  <div className="stat-item">
-                                    <i className="fas fa-building stat-icon"></i>
-                                    <h3>Branches</h3>
-                                    <p>Multiple Departments</p>
-                                  </div>
-                                </Col>
-                                <Col md={4}>
-                                  <div className="stat-item">
-                                    <i className="fas fa-chart-line stat-icon"></i>
-                                    <h3>Analytics</h3>
-                                    <p>Track Progress</p>
-                                  </div>
-                                </Col>
-                              </Row>
-                            </div>
-                            <div className="hero-actions">
-                              <Link to="/create-student" className="btn btn-primary btn-lg me-3 hero-btn">
-                                <i className="fas fa-user-plus me-2"></i>
-                                Create New Student
-                              </Link>
-                              <Link to="/student-list" className="btn btn-outline-light btn-lg hero-btn">
-                                <i className="fas fa-list me-2"></i>
-                                View All Students
-                              </Link>
-                            </div>
-                          </div>
-                        </Col>
-                      </Row>
-                    </Container>
+                  <div className="text-center py-5">
+                    <h2>Welcome to My Class Room</h2>
+                    <p className="lead">Student Management System</p>
+                    <div className="mt-4">
+                      <Link to="/create-student" className="btn btn-primary me-3">
+                        Create New Student
+                      </Link>
+                      <Link to="/student-list" className="btn btn-outline-primary">
+                        View All Students
+                      </Link>
+                    </div>
                   </div>
                 </Route>
 

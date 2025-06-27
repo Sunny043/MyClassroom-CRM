@@ -65,18 +65,6 @@ router.route('/create-student').post(verifyToken, async (req, res, next) => {
       });
     }
 
-    // Check if studentId already exists
-    const existingStudentId = await Student.findOne({ studentId: studentId.toUpperCase() });
-    if (existingStudentId) {
-      return res.status(400).json({ message: 'Student ID already exists' });
-    }
-
-    // Check if rollNo already exists
-    const existingRollNo = await Student.findOne({ rollNo: rollNo.toUpperCase() });
-    if (existingRollNo) {
-      return res.status(400).json({ message: 'Roll number already exists' });
-    }
-
     // Generate roll number if not provided
     let finalRollNo = rollNo;
     if (!finalRollNo) {
@@ -202,52 +190,27 @@ router.route('/update-student/:id').put(verifyToken, async (req, res) => {
     const {
       firstName, lastName, email, phone, dateOfBirth, gender, address,
       rollNo, sectionName, year, semester, academicYear,
-      guardianName, guardianPhone, emergencyContact, bloodGroup,
-      name // For backward compatibility
+      guardianName, guardianPhone, emergencyContact, bloodGroup
     } = req.body;
 
-    // Handle backward compatibility for old single 'name' field
-    let finalFirstName = firstName;
-    let finalLastName = lastName;
-    
-    if (name && !firstName && !lastName) {
-      const nameParts = name.trim().split(' ');
-      finalFirstName = nameParts[0] || '';
-      finalLastName = nameParts.slice(1).join(' ') || '';
-    }
-
-    // Validate required fields only if they are being updated
-    if (finalFirstName !== undefined && (!finalFirstName || !finalFirstName.trim())) {
-      return res.status(400).json({ message: 'First name cannot be empty' });
-    }
-    if (finalLastName !== undefined && (!finalLastName || !finalLastName.trim())) {
-      return res.status(400).json({ message: 'Last name cannot be empty' });
-    }
-    if (email !== undefined && (!email || !email.trim())) {
-      return res.status(400).json({ message: 'Email cannot be empty' });
-    }
-    if (rollNo !== undefined && (!rollNo || !rollNo.trim())) {
-      return res.status(400).json({ message: 'Roll number cannot be empty' });
-    }
-
-    // Update fields - only update if provided in request
+    // Update fields
     const updateData = {};
-    if (finalFirstName !== undefined) updateData.firstName = finalFirstName.trim();
-    if (finalLastName !== undefined) updateData.lastName = finalLastName.trim();
-    if (email !== undefined) updateData.email = email.toLowerCase().trim();
-    if (phone !== undefined) updateData.phone = phone.trim();
-    if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
-    if (gender !== undefined) updateData.gender = gender;
-    if (address !== undefined) updateData.address = address;
-    if (rollNo !== undefined) updateData.rollNo = rollNo.trim();
-    if (sectionName !== undefined) updateData.sectionName = sectionName;
-    if (year !== undefined) updateData.year = year ? parseInt(year) : null;
-    if (semester !== undefined) updateData.semester = semester ? parseInt(semester) : null;
-    if (academicYear !== undefined) updateData.academicYear = academicYear.trim();
-    if (guardianName !== undefined) updateData.guardianName = guardianName.trim();
-    if (guardianPhone !== undefined) updateData.guardianPhone = guardianPhone.trim();
-    if (emergencyContact !== undefined) updateData.emergencyContact = emergencyContact;
-    if (bloodGroup !== undefined) updateData.bloodGroup = bloodGroup.trim();
+    if (firstName) updateData.firstName = firstName.trim();
+    if (lastName) updateData.lastName = lastName.trim();
+    if (email) updateData.email = email.toLowerCase().trim();
+    if (phone) updateData.phone = phone.trim();
+    if (dateOfBirth) updateData.dateOfBirth = new Date(dateOfBirth);
+    if (gender) updateData.gender = gender;
+    if (address) updateData.address = address;
+    if (rollNo) updateData.rollNo = rollNo.trim();
+    if (sectionName) updateData.sectionName = sectionName;
+    if (year) updateData.year = parseInt(year);
+    if (semester) updateData.semester = parseInt(semester);
+    if (academicYear) updateData.academicYear = academicYear.trim();
+    if (guardianName) updateData.guardianName = guardianName.trim();
+    if (guardianPhone) updateData.guardianPhone = guardianPhone.trim();
+    if (emergencyContact) updateData.emergencyContact = emergencyContact;
+    if (bloodGroup) updateData.bloodGroup = bloodGroup.trim();
 
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,

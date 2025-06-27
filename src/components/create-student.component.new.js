@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Form, Button, Alert, Spinner, Row, Col, Card } from "react-bootstrap";
-import { useHistory, useParams } from "react-router-dom";
+import { Form, Button, Alert, Row, Col, Card } from "react-bootstrap";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
-function EditStudent() {
+function CreateStudent() {
   const [formData, setFormData] = useState({
     // Personal Information
     firstName: "",
@@ -43,20 +43,26 @@ function EditStudent() {
 
   const [branches, setBranches] = useState([]);
   const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [user, setUser] = useState(null);
-  
   const history = useHistory();
-  const { id } = useParams();
 
   // Get current user
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      
+      // If coordinator, set their branch automatically
+      if (parsedUser.role === "coordinator" && parsedUser.branch) {
+        setFormData(prev => ({
+          ...prev,
+          branchId: parsedUser.branch._id
+        }));
+      }
     }
   }, []);
 
@@ -96,59 +102,6 @@ function EditStudent() {
     }
   }, [formData.branchId, fetchSections]);
 
-  useEffect(() => {
-    const fetchStudent = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:4000/students/edit-student/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        const student = response.data;
-        
-        setFormData({
-          firstName: student.firstName || "",
-          lastName: student.lastName || "",
-          email: student.email || "",
-          phone: student.phone || "",
-          dateOfBirth: student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split('T')[0] : "",
-          gender: student.gender || "",
-          address: {
-            street: student.address?.street || "",
-            city: student.address?.city || "",
-            state: student.address?.state || "",
-            zipCode: student.address?.zipCode || "",
-            country: student.address?.country || "India"
-          },
-          studentId: student.studentId || "",
-          rollNo: student.rollNo || "",
-          branchId: student.branchId?._id || "",
-          sectionName: student.sectionName || "A",
-          year: student.year?.toString() || "",
-          semester: student.semester?.toString() || "",
-          admissionDate: student.admissionDate ? new Date(student.admissionDate).toISOString().split('T')[0] : "",
-          academicYear: student.academicYear || "",
-          guardianName: student.guardianName || "",
-          guardianPhone: student.guardianPhone || "",
-          emergencyContact: {
-            name: student.emergencyContact?.name || "",
-            phone: student.emergencyContact?.phone || "",
-            relation: student.emergencyContact?.relation || ""
-          },
-          bloodGroup: student.bloodGroup || ""
-        });
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching student:", error);
-        setError("Failed to fetch student data. Please try again.");
-        setLoading(false);
-      }
-    };
-
-    fetchStudent();
-  }, [id]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     
@@ -167,65 +120,82 @@ function EditStudent() {
         [name]: value
       }));
     }
-    
-    // Clear messages when user starts typing
-    if (error) setError("");
-    if (success) setSuccess("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate required fields
-    if (!formData.firstName.trim() || !formData.lastName.trim() || 
-        !formData.email.trim() || !formData.rollNo.trim()) {
-      setError("First name, last name, email, and roll number are required");
-      return;
-    }
-
-    setUpdating(true);
+    setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:4000/students/update-student/${id}`, formData, {
+      if (!token) {
+        setError("Please login to continue");
+        return;
+      }
+
+      await axios.post("http://localhost:4000/students/create-student", formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      setSuccess("Student created successfully!");
       
-      console.log("Student updated successfully:", response.data);
-      setSuccess("Student updated successfully!");
-      
-      // Redirect to student list after 2 seconds
+      // Reset form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dateOfBirth: "",
+        gender: "",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "India"
+        },
+        studentId: "",
+        rollNo: "",
+        branchId: user?.role === "coordinator" ? user.branch?._id : "",
+        sectionName: "A",
+        year: "",
+        semester: "",
+        admissionDate: "",
+        academicYear: "",
+        guardianName: "",
+        guardianPhone: "",
+        emergencyContact: {
+          name: "",
+          phone: "",
+          relation: ""
+        },
+        bloodGroup: ""
+      });
+
+      // Redirect after 2 seconds
       setTimeout(() => {
         history.push("/student-list");
       }, 2000);
 
     } catch (error) {
-      console.error("Error updating student:", error);
+      console.error("Error creating student:", error);
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message);
       } else {
-        setError("Failed to update student. Please try again.");
+        setError("Failed to create student. Please try again.");
       }
     } finally {
-      setUpdating(false);
+      setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="text-center" style={{ margin: "50px" }}>
-        <Spinner animation="border" />
-        <div>Loading student data...</div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "20px" }}>
       <Card className="shadow-lg">
-        <Card.Header className="bg-warning text-dark">
-          <h3 className="mb-0 text-center">Edit Student</h3>
+        <Card.Header className="bg-primary text-white">
+          <h3 className="mb-0 text-center">Create New Student</h3>
         </Card.Header>
         <Card.Body className="p-4">
           {error && <Alert variant="danger">{error}</Alert>}
@@ -280,13 +250,14 @@ function EditStudent() {
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Label>Phone Number *</Form.Label>
                     <Form.Control
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="Enter phone number"
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -295,23 +266,25 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Date of Birth</Form.Label>
+                    <Form.Label>Date of Birth *</Form.Label>
                     <Form.Control
                       type="date"
                       name="dateOfBirth"
                       value={formData.dateOfBirth}
                       onChange={handleChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Gender</Form.Label>
+                    <Form.Label>Gender *</Form.Label>
                     <Form.Control
                       as="select"
                       name="gender"
                       value={formData.gender}
                       onChange={handleChange}
+                      required
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -365,30 +338,26 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Student ID</Form.Label>
+                    <Form.Label>Student ID *</Form.Label>
                     <Form.Control
                       type="text"
                       name="studentId"
                       value={formData.studentId}
                       onChange={handleChange}
                       placeholder="Enter student ID"
-                      disabled
+                      required
                     />
-                    <Form.Text className="text-muted">
-                      Student ID cannot be changed
-                    </Form.Text>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Roll Number *</Form.Label>
+                    <Form.Label>Roll Number</Form.Label>
                     <Form.Control
                       type="text"
                       name="rollNo"
                       value={formData.rollNo}
                       onChange={handleChange}
-                      placeholder="Enter roll number"
-                      required
+                      placeholder="Auto-generated if empty"
                     />
                   </Form.Group>
                 </Col>
@@ -397,12 +366,13 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Branch</Form.Label>
+                    <Form.Label>Branch *</Form.Label>
                     <Form.Control
                       as="select"
                       name="branchId"
                       value={formData.branchId}
                       onChange={handleChange}
+                      required
                       disabled={user?.role === "coordinator"}
                     >
                       <option value="">Select Branch</option>
@@ -412,16 +382,22 @@ function EditStudent() {
                         </option>
                       ))}
                     </Form.Control>
+                    {user?.role === "coordinator" && (
+                      <Form.Text className="text-muted">
+                        You can only create students in your assigned branch
+                      </Form.Text>
+                    )}
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Section</Form.Label>
+                    <Form.Label>Section *</Form.Label>
                     <Form.Control
                       as="select"
                       name="sectionName"
                       value={formData.sectionName}
                       onChange={handleChange}
+                      required
                       disabled={!formData.branchId}
                     >
                       <option value="">
@@ -440,12 +416,13 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Year</Form.Label>
+                    <Form.Label>Year *</Form.Label>
                     <Form.Control
                       as="select"
                       name="year"
                       value={formData.year}
                       onChange={handleChange}
+                      required
                     >
                       <option value="">Select Year</option>
                       <option value="1">1st Year</option>
@@ -457,12 +434,13 @@ function EditStudent() {
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Semester</Form.Label>
+                    <Form.Label>Semester *</Form.Label>
                     <Form.Control
                       as="select"
                       name="semester"
                       value={formData.semester}
                       onChange={handleChange}
+                      required
                     >
                       <option value="">Select Semester</option>
                       <option value="1">1st Semester</option>
@@ -481,24 +459,26 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Admission Date</Form.Label>
+                    <Form.Label>Admission Date *</Form.Label>
                     <Form.Control
                       type="date"
                       name="admissionDate"
                       value={formData.admissionDate}
                       onChange={handleChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Academic Year</Form.Label>
+                    <Form.Label>Academic Year *</Form.Label>
                     <Form.Control
                       type="text"
                       name="academicYear"
                       value={formData.academicYear}
                       onChange={handleChange}
                       placeholder="e.g., 2024-25"
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -511,25 +491,27 @@ function EditStudent() {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Guardian Name</Form.Label>
+                    <Form.Label>Guardian Name *</Form.Label>
                     <Form.Control
                       type="text"
                       name="guardianName"
                       value={formData.guardianName}
                       onChange={handleChange}
                       placeholder="Enter guardian name"
+                      required
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Guardian Phone</Form.Label>
+                    <Form.Label>Guardian Phone *</Form.Label>
                     <Form.Control
                       type="tel"
                       name="guardianPhone"
                       value={formData.guardianPhone}
                       onChange={handleChange}
                       placeholder="Enter guardian phone"
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -563,24 +545,16 @@ function EditStudent() {
               </Row>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+            {/* Submit Button */}
+            <div className="d-grid">
               <Button 
-                variant="secondary" 
-                size="lg" 
-                onClick={() => history.push("/student-list")}
-                disabled={updating}
-                className="me-md-2"
-              >
-                Cancel
-              </Button>
-              <Button 
-                variant="warning" 
+                variant="primary" 
                 type="submit" 
                 size="lg" 
-                disabled={updating}
+                disabled={loading}
+                className="mt-3"
               >
-                {updating ? "Updating..." : "Update Student"}
+                {loading ? "Creating..." : "Create Student"}
               </Button>
             </div>
           </Form>
@@ -590,4 +564,4 @@ function EditStudent() {
   );
 }
 
-export default EditStudent;
+export default CreateStudent;
