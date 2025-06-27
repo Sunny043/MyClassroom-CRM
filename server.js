@@ -71,6 +71,11 @@ app.listen(port, '0.0.0.0', () => {
 // Error handler
 app.use((error, req, res, next) => {
   console.error('🚨 Server Error:', error);
+  console.error('🔍 Error stack:', error.stack);
+  console.error('📍 Request URL:', req.url);
+  console.error('📋 Request method:', req.method);
+  console.error('📦 Request body:', req.body);
+  
   res.status(500).json({ 
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'

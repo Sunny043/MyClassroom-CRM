@@ -62,8 +62,18 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    console.error('🚨 Login error:', error);
+    console.error('🔍 Error details:', {
+      message: error.message,
+      stack: error.stack,
+      username: req.body.username,
+      JWT_SECRET_exists: !!JWT_SECRET,
+      MONGODB_URI_exists: !!process.env.MONGODB_URI
+    });
+    res.status(500).json({ 
+      message: 'Server error during login',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
