@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Alert, Card, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 function Login({ onLogin }) {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ function Login({ onLogin }) {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:4000/auth/login", formData);
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, formData);
       
       if (response.data.token) {
         // Store token and user data

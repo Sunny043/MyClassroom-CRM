@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Row, Col, Card, Badge, Modal } from "react-bootstrap";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 function BranchManagement() {
   const [branches, setBranches] = useState([]);
@@ -41,7 +42,7 @@ function BranchManagement() {
   const fetchBranches = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:4000/branches", {
+      const response = await axios.get(`${API_BASE_URL}/branches`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBranches(response.data);
@@ -59,7 +60,7 @@ function BranchManagement() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:4000/branches/create", branchForm, {
+      await axios.post(`${API_BASE_URL}/branches/create`, branchForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

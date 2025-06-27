@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
+import API_BASE_URL from "../config/api";
 
 function StudentList() {
   const [students, setStudents] = useState([]);
@@ -22,7 +23,7 @@ function StudentList() {
   const fetchStudents = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:4000/students/", {
+      const res = await axios.get(`${API_BASE_URL}/students/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStudents(res.data);
@@ -111,7 +112,7 @@ function StudentList() {
     setDeleting(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:4000/students/delete-student/${id}`, {
+      await axios.delete(`${API_BASE_URL}/students/delete-student/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStudents();
